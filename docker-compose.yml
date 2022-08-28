@@ -59,6 +59,7 @@ services:
      volumes:
         - './seed/es/es_init.sh:/usr/local/bin/configure-stack.sh:ro'
         - './seed/es/data.json:/usr/local/bin/data.json'
+        - './seed/es/books_temp.json:/usr/local/bin/books_temp.json'
      command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
      networks:
        - 'esnet'
