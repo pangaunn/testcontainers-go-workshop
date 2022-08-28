@@ -25,3 +25,4 @@ gomock_reflect_*
 data-volume
 
 ./seed/es/nodes
+./es

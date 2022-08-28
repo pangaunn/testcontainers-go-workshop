@@ -27,10 +27,6 @@ services:
     environment:
       - xpack.security.enabled=false
       - "discovery.type=single-node"
-    # volumes:
-    #   - ./seed:/usr/share/elasticsearch/data
-    # entrypoint:
-    #   - /usr/share/elasticsearch/data/es/es_init.sh
     ports:
       - 9200:9200
     networks:
@@ -61,9 +57,7 @@ services:
         - 'ELASTIC_VERSION=7.17.6'
         - 'ES_PASSWORD=changeme'
      volumes:
-        # - './seed/:/usr/local/bin/'
         - './seed/es/es_init.sh:/usr/local/bin/configure-stack.sh:ro'
-        # './seed/es/es_init.sh:/usr/local/bin/configure-stack.sh'
      command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
      networks:
        - 'esnet'
