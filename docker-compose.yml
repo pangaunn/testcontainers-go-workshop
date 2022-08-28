@@ -21,3 +21,60 @@ services:
       MYSQL_DATABASE: "books"
     volumes:
       - ./seed/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  elasticsearch:
+    image: elasticsearch:7.17.6
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    # volumes:
+    #   - ./seed:/usr/share/elasticsearch/data
+    # entrypoint:
+    #   - /usr/share/elasticsearch/data/es/es_init.sh
+    ports:
+      - 9200:9200
+    networks:
+      - esnet
+    healthcheck:
+      test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:changeme", "http://localhost:9200/_cat/health"]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.6
+    environment:
+      - "ELASTICSEARCH_PASSWORD=changeme"
+      - server.port=127.0.0.1:5601
+      - elasticsearch.url="http://elasticsearch:9200"
+      - server.name="kibana"
+    ports:
+      - 5601:5601
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-f", "http://localhost:5601/login"]
+      retries: 6
+    networks:
+      - esnet
+    depends_on:
+      - elasticsearch
+
+  configure_elasticsearch:
+     image: docker.elastic.co/beats/metricbeat:7.17.6
+     environment:
+        - 'ELASTIC_VERSION=7.17.6'
+        - 'ES_PASSWORD=changeme'
+     volumes:
+        # - './seed/:/usr/local/bin/'
+        - './seed/es/es_init.sh:/usr/local/bin/configure-stack.sh:ro'
+        # './seed/es/es_init.sh:/usr/local/bin/configure-stack.sh'
+     command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
+     networks:
+       - 'esnet'
+     depends_on:
+        - 'elasticsearch'
+        - 'kibana'
+
+networks:
+  esnet:
+      driver: bridge
+      ipam:
+        driver: default
+        config:
+        - subnet: 192.168.1.0/24

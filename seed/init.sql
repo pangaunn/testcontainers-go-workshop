@@ -11,4 +11,4 @@ CREATE TABLE `book` (
 
 INSERT INTO `book` (`id`, `name`, `price`, `author`, `description`, `image_url`)
 VALUES
-	(1, 'harry potter', 530, 'JK rowling', 'harry porter 1 ', 'http://www.adviceforyou.co.th/blog/wp-content/uploads/2011/12/harry-potter.jpeg');
+	(1, 'harry potter', 530, 'JK rowling', 'harry porter 1', 'http://www.adviceforyou.co.th/blog/wp-content/uploads/2011/12/harry-potter.jpeg');
