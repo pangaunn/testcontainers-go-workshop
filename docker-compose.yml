@@ -58,6 +58,7 @@ services:
         - 'ES_PASSWORD=changeme'
      volumes:
         - './seed/es/es_init.sh:/usr/local/bin/configure-stack.sh:ro'
+        - './seed/es/data.json:/usr/local/bin/data.json'
      command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
      networks:
        - 'esnet'
@@ -68,7 +69,3 @@ services:
 networks:
   esnet:
       driver: bridge
-      ipam:
-        driver: default
-        config:
-        - subnet: 192.168.1.0/24
