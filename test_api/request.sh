@@ -18,6 +18,6 @@ curl --location --request PUT 'http://localhost:3000/api/v1/book/1' \
     "name": "harry potter 1.5",
     "price": 350,
     "author": "JK rowling",
-    "description": "harry porter 1.5",
+    "description": "harry potter 1.5",
     "imageUrl": "http://www.adviceforyou.co.th/blog/wp-content/uploads/2011/12/harry-potter.jpeg"
 }'
