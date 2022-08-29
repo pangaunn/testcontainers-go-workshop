@@ -1,4 +1,4 @@
 { "index": { "_index": "books", "_id": "1", "_type": "_doc" } }
-{ "id": 1, "name": "Book 1: Harry Potter and the Sorcerer's Stone", "price": 100, "author": "JK Rowling", "description": "Harry Potter and the Sorcerer's Stone", "imageURL": "https://content.time.com/time/2007/harry_potter/hp_books/sorce_stone.jpg"}
+{ "id": 1, "name": "Book 1: Harry Potter and the Sorcerer's Stone", "price": 100.00, "author": "JK Rowling", "description": "Harry Potter and the Sorcerer's Stone", "imageURL": "https://content.time.com/time/2007/harry_potter/hp_books/sorce_stone.jpg"}
 { "index": { "_index": "books", "_id": "2", "_type": "_doc" } }
-{ "id": 2, "name": "Book 2: Harry Potter and the Chamber of Secrets", "price": 150, "author": "JK Rowling", "description": "Book 2: Harry Potter and the Chamber of Secrets", "imageURL": "https://content.time.com/time/2007/harry_potter/hp_books/chamber_of_secrets.jpg"}
+{ "id": 2, "name": "Book 2: Harry Potter and the Chamber of Secrets", "price": 150.50, "author": "JK Rowling", "description": "Book 2: Harry Potter and the Chamber of Secrets", "imageURL": "https://content.time.com/time/2007/harry_potter/hp_books/chamber_of_secrets.jpg"}

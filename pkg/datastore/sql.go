@@ -14,7 +14,6 @@ func InitMySQL(conn string) *sqlx.DB {
 	db, err := sqlx.Connect("mysql", connStr)
 	if err != nil {
 		logger.Fatal("sqlx.Connect Error: ", err)
-
 	}
 	return db
 }

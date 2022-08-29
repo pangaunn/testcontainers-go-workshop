@@ -17,7 +17,7 @@
                   "analyzer": "rebuilt_thai"
               },
               "price": {
-                  "type": "integer"
+                  "type": "double"
               },
               "author": {
                   "type": "text",

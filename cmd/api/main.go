@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/pangaunn/testcontainers-go-workshop/cmd/api/handler"
@@ -45,8 +46,16 @@ func main() {
 
 	connStr := generateMysqlConnectionString(dbCredential)
 	sqlConn := datastore.InitMySQL(connStr)
+
+	cfg := elasticsearch.Config{Addresses: []string{os.Getenv("ELASTICSEARCH_API_ENDPOINT")}}
+	esClient, err := elasticsearch.NewClient(cfg)
+	if err != nil {
+		logger.Fatal("elasticsearch.NewClient Error: ", err)
+	}
+
 	bookRepo := repository.NewBookRepo(sqlConn)
-	bookSvc := book.NewBookService(bookRepo)
+	bookESRepo := repository.NewBookESRepo(esClient, time.Second*5)
+	bookSvc := book.NewBookService(bookRepo, bookESRepo)
 	bookHandler := handler.NewHandler(bookSvc)
 
 	r := gin.Default()

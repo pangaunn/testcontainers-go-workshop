@@ -6,7 +6,7 @@ curl --location --request POST 'http://localhost:3000/api/v1/book/' \
     "name": "harry potter 2",
     "price": 600,
     "author": "JK rowling",
-    "description": "harry porter 2",
+    "description": "harry potter 2",
     "imageUrl": "http://www.adviceforyou.co.th/blog/wp-content/uploads/2011/12/harry-potter.jpeg"
 }'
 

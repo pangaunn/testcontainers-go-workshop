@@ -29,7 +29,7 @@ func (h handler) NewBook(c *gin.Context) {
 		return
 	}
 
-	response, err := h.bookSvc.NewBook(bookRequest)
+	response, err := h.bookSvc.NewBook(c, bookRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -46,7 +46,7 @@ func (h handler) GetBookByID(c *gin.Context) {
 		return
 	}
 
-	response, err := h.bookSvc.GetBookByID(int64(idInt))
+	response, err := h.bookSvc.GetBookByID(c, int64(idInt))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -62,7 +62,7 @@ func (h handler) DeleteBookByID(c *gin.Context) {
 		return
 	}
 
-	err = h.bookSvc.DeleteByID(int64(idInt))
+	err = h.bookSvc.DeleteByID(c, int64(idInt))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -84,7 +84,7 @@ func (h handler) UpdateBookByID(c *gin.Context) {
 		return
 	}
 
-	response, err := h.bookSvc.UpdateByID(int64(idInt), bookRequest)
+	response, err := h.bookSvc.UpdateByID(c, int64(idInt), bookRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return

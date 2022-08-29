@@ -3,6 +3,7 @@ module github.com/pangaunn/testcontainers-go-workshop
 go 1.17
 
 require (
+	github.com/elastic/go-elasticsearch/v7 v7.17.2-0.20220823112509-736c91e57144
 	github.com/gin-gonic/gin v1.8.1
 	github.com/joho/godotenv v1.4.0
 )

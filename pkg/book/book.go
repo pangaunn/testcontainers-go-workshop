@@ -1,5 +1,7 @@
 package book
 
+import "context"
+
 type NewBookRequest struct {
 	Name        string  `json:"name"`
 	Price       float64 `json:"price"`
@@ -18,8 +20,8 @@ type BookResponse struct {
 }
 
 type BookService interface {
-	NewBook(NewBookRequest) (*BookResponse, error)
-	GetBookByID(id int64) (*BookResponse, error)
-	DeleteByID(id int64) error
-	UpdateByID(id int64, book NewBookRequest) (*BookResponse, error)
+	NewBook(ctx context.Context, book NewBookRequest) (*BookResponse, error)
+	GetBookByID(ctx context.Context, id int64) (*BookResponse, error)
+	DeleteByID(ctx context.Context, id int64) error
+	UpdateByID(ctx context.Context, id int64, book NewBookRequest) (*BookResponse, error)
 }

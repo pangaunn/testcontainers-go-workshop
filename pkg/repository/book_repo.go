@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -14,9 +16,9 @@ func NewBookRepo(db *sqlx.DB) BookRepo {
 	}
 }
 
-func (br *bookRepo) Create(b Book) (*Book, error) {
+func (br *bookRepo) Create(ctx context.Context, b Book) (*Book, error) {
 	query := `insert into book (name, price, author, description, image_url) values (?,?,?,?,?)`
-	result, err := br.db.Exec(query, b.Name, b.Price, b.Author, b.Description, b.ImageURL)
+	result, err := br.db.ExecContext(ctx, query, b.Name, b.Price, b.Author, b.Description, b.ImageURL)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +33,7 @@ func (br *bookRepo) Create(b Book) (*Book, error) {
 
 }
 
-func (br *bookRepo) GetByID(id int64) (*Book, error) {
+func (br *bookRepo) GetByID(ctx context.Context, id int64) (*Book, error) {
 	var book Book
 	err := br.db.Get(&book, `select id, name, price, author, description, image_url from book where id= ? `, id)
 	if err != nil {
@@ -40,16 +42,16 @@ func (br *bookRepo) GetByID(id int64) (*Book, error) {
 	return &book, nil
 }
 
-func (br *bookRepo) DeleteByID(id int64) error {
-	_, err := br.db.Exec(`delete from book where id=?`, id)
+func (br *bookRepo) DeleteByID(ctx context.Context, id int64) error {
+	_, err := br.db.ExecContext(ctx, `delete from book where id=?`, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (br *bookRepo) Update(id int64, b Book) (*Book, error) {
-	_, err := br.db.NamedExec(`update book SET name=:name, price=:price, author=:author, description=:description, image_url=:image_url`, &b)
+func (br *bookRepo) Update(ctx context.Context, id int64, b Book) (*Book, error) {
+	_, err := br.db.NamedExecContext(ctx, `update book SET name=:name, price=:price, author=:author, description=:description, image_url=:image_url`, &b)
 	if err != nil {
 		return nil, err
 	}
