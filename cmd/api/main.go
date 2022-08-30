@@ -29,9 +29,13 @@ type databaseCredential struct {
 }
 
 func init() {
-	err := godotenv.Load("./.env")
-	if err != nil {
-		logger.Info("Can't load .env", err)
+	if currentEnvironment, ok := os.LookupEnv("ENV"); ok {
+		if currentEnvironment == "dev" {
+			err := godotenv.Load("./.env")
+			if err != nil {
+				logger.Info("Can't load .env", err)
+			}
+		}
 	}
 }
 

@@ -3,12 +3,15 @@ version: '3.9'
 services:
   testcontainers-go-workshop:
     build:
-      context: ""
+      context: .
       dockerfile: Dockerfile 
     ports:
       - 3000:3000
     env_file:
       - "./.env"
+    depends_on:
+      db:
+        condition: service_healthy
     
   db:
     image: mariadb:10.5.8
@@ -21,6 +24,10 @@ services:
       MYSQL_DATABASE: "books"
     volumes:
       - ./seed/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_ROOT_USERNAME --password=$$MYSQL_ROOT_PASSWORD
+      timeout: 20s
+      retries: 10
 
   elasticsearch:
     image: elasticsearch:7.17.6
@@ -29,8 +36,6 @@ services:
       - "discovery.type=single-node"
     ports:
       - 9200:9200
-    networks:
-      - esnet
     healthcheck:
       test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:changeme", "http://localhost:9200/_cat/health"]
 
@@ -46,8 +51,6 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-s", "-f", "http://localhost:5601/login"]
       retries: 6
-    networks:
-      - esnet
     depends_on:
       - elasticsearch
 
@@ -61,12 +64,6 @@ services:
         - './seed/es/data.json:/usr/local/bin/data.json'
         - './seed/es/books_temp.json:/usr/local/bin/books_temp.json'
      command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
-     networks:
-       - 'esnet'
      depends_on:
-        - 'elasticsearch'
-        - 'kibana'
-
-networks:
-  esnet:
-      driver: bridge
+        - elasticsearch
+        - kibana
