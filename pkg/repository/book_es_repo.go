@@ -74,7 +74,6 @@ func (bes *bookESRepo) Search(ctx context.Context, keyword string) (*esapi.Respo
 		bes.esClient.Search.WithContext(context.Background()),
 		bes.esClient.Search.WithIndex(BOOKS_TEMP_INDEX),
 		bes.esClient.Search.WithBody(strings.NewReader(query)),
-		bes.esClient.Search.WithPretty(),
 	)
 	if err != nil || res.IsError() {
 		logger.Warn("bes.esClient.Search Error:", err)
