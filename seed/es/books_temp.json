@@ -1,60 +1,71 @@
 {
-  "index_patterns": [
-      "books_*"
-  ],
-  "mappings": {
-      "_doc": {
-          "_source": {
-              "enabled": true
-          },
-          "dynamic": "false",
-          "properties": {
-              "id": {
-                  "type": "integer"
-              },
-              "name": {
-                  "type": "text",
-                  "analyzer": "rebuilt_thai"
-              },
-              "price": {
-                  "type": "double"
-              },
-              "author": {
-                  "type": "text",
-                  "analyzer": "rebuilt_thai"
-              },
-              "description": {
-                  "type": "text",
-                  "analyzer": "rebuilt_thai"
-              },
-              "imageURL": {
-                  "type": "text"
-              }
-          }
-      }
-  },
-  "settings": {
-      "number_of_shards": "1",
-      "auto_expand_replicas": "0-all",
-      "max_result_window": "5000",
-      "analysis": {
-          "filter": {
-              "thai_stop": {
-                  "type": "stop",
-                  "stopwords": "_thai_"
-              }
-          },
-          "analyzer": {
-              "rebuilt_thai": {
-                  "tokenizer": "thai",
-                  "filter": [
-                      "lowercase",
-                      "asciifolding",
-                      "decimal_digit",
-                      "thai_stop"
-                  ]
-              }
-          }
-      }
+    "index_patterns": [
+        "books_*"
+    ],
+    "template": {
+        "mappings": {
+            "_source": {
+                "enabled": true
+            },
+            "dynamic": "false",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "text",
+                    "analyzer": "rebuilt_thai"
+                },
+                "price": {
+                    "type": "double"
+                },
+                "author": {
+                    "type": "text",
+                    "analyzer": "rebuilt_thai"
+                },
+                "description": {
+                    "type": "text",
+                    "analyzer": "rebuilt_thai"
+                },
+                "imageURL": {
+                    "type": "text"
+                }
+            }
+        },
+        "settings": {
+            "number_of_shards": "1",
+            "auto_expand_replicas": "0-all",
+            "max_result_window": "5000",
+            "analysis": {
+                "filter": {
+                    "thai_stop": {
+                        "type": "stop",
+                        "stopwords": "_thai_"
+                    }
+                },
+                "analyzer": {
+                    "rebuilt_thai": {
+                        "tokenizer": "thai",
+                        "char_filter": [
+                            "tokenized_char_mapping_filter"
+                        ],
+                        "filter": [
+                            "lowercase",
+                            "asciifolding",
+                            "decimal_digit",
+                            "thai_stop"
+                        ]
+                    }
+                },
+                "char_filter": {
+                    "tokenized_char_mapping_filter": {
+                        "type": "mapping",
+                        "mappings": [
+                            "- => _"
+                        ]
+                    }
+                }
+            }
+        }
+    }
   }
-}

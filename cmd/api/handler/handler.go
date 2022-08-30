@@ -40,8 +40,8 @@ func (h handler) NewBook(c *gin.Context) {
 }
 
 func (h handler) GetBookByID(c *gin.Context) {
-	id := c.Param("id")
-	idInt, err := strconv.Atoi(id)
+	ID := c.Param("id")
+	idInt, err := strconv.Atoi(ID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
@@ -60,8 +60,8 @@ func (h handler) GetBookByID(c *gin.Context) {
 }
 
 func (h handler) DeleteBookByID(c *gin.Context) {
-	id := c.Param("id")
-	idInt, err := strconv.Atoi(id)
+	ID := c.Param("id")
+	idInt, err := strconv.Atoi(ID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
@@ -77,8 +77,8 @@ func (h handler) DeleteBookByID(c *gin.Context) {
 }
 
 func (h handler) UpdateBookByID(c *gin.Context) {
-	id := c.Param("id")
-	idInt, err := strconv.Atoi(id)
+	ID := c.Param("id")
+	idInt, err := strconv.Atoi(ID)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return

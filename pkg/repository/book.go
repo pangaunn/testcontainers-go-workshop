@@ -17,9 +17,9 @@ type Book struct {
 
 type BookRepo interface {
 	Create(ctx context.Context, b Book) (*Book, error)
-	Update(ctx context.Context, id int64, b Book) (*Book, error)
-	DeleteByID(ctx context.Context, id int64) error
-	GetByID(ctx context.Context, id int64) (*Book, error)
+	Update(ctx context.Context, b Book) (*Book, error)
+	DeleteByID(ctx context.Context, ID int64) error
+	GetByID(ctx context.Context, ID int64) (*Book, error)
 }
 
 type BookESRepo interface {
