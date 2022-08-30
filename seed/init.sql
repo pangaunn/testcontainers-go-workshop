@@ -11,4 +11,5 @@ CREATE TABLE `book` (
 
 INSERT INTO `book` (`id`, `name`, `price`, `author`, `description`, `image_url`)
 VALUES
-	(1, 'harry potter', 530, 'JK rowling', 'harry porter 1', 'http://www.adviceforyou.co.th/blog/wp-content/uploads/2011/12/harry-potter.jpeg');
+	(1, "Book 1: Harry Potter and the Sorcerer's Stone", 530, 'JK rowling', "Harry Potter and the Sorcerer's Stone", 'http://www.adviceforyou.co.th/blog/wp-content/uploads/2011/12/harry-potter.jpeg'),
+  (2, 'Book 2: Harry Potter and the Chamber of Secrets', 530, 'JK rowling', "Book 2: Harry Potter and the Chamber of Secrets", 'https://content.time.com/time/2007/harry_potter/hp_books/chamber_of_secrets.jpg');

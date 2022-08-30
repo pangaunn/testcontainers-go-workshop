@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -48,6 +49,10 @@ func (h handler) GetBookByID(c *gin.Context) {
 
 	response, err := h.bookSvc.GetBookByID(c, int64(idInt))
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, "book not found")
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

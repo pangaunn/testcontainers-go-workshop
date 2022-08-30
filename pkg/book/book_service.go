@@ -2,8 +2,6 @@ package book
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/repository"
 	logger "github.com/sirupsen/logrus"
@@ -56,9 +54,6 @@ func (b *bookService) NewBook(ctx context.Context, data NewBookRequest) (*BookRe
 func (b *bookService) GetBookByID(ctx context.Context, id int64) (*BookResponse, error) {
 	book, err := b.bookRepo.GetByID(ctx, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("book not found")
-		}
 		return nil, err
 	}
 
