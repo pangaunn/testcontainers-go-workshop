@@ -21,14 +21,14 @@ func TestHandler(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
-	SetupContainer()
+	setupMariaDBContainer()
 })
 
-func SetupContainer() {
+func setupMariaDBContainer() {
 
 	ctx := context.Background()
 	wd, _ := os.Getwd()
-	wd = wd + "/../../../seed/init.sql"
+	wd += "/../../../seed/init.sql"
 	fmt.Println(wd)
 	mariadbContainerReq := testcontainers.ContainerRequest{
 		Image:        "mariadb:10.5.8",
@@ -59,7 +59,4 @@ func SetupContainer() {
 	}
 
 	fmt.Println(mariaDBHost, mariaDBPort)
-
-	// time.Sleep(100000 * time.Hour)
-
 }
