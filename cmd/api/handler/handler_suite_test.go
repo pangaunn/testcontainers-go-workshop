@@ -24,12 +24,15 @@ type ContainerAddress struct {
 	Port string
 }
 
+var (
+	Maria ContainerAddress
+	ES    ContainerAddress
+)
+
 var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
-	maria := setupMariaDBContainer()
-	es := setupElasticSearchContainer()
-
-	fmt.Println(maria, es)
+	Maria = setupMariaDBContainer()
+	ES = setupElasticSearchContainer()
 })
 
 func setupMariaDBContainer() ContainerAddress {
