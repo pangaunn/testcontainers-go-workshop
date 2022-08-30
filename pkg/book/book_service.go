@@ -2,14 +2,38 @@ package book
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/repository"
 	logger "github.com/sirupsen/logrus"
 )
 
+type SearchResult struct {
+	Hits SearchResultHits `json:"hits"`
+}
+
+type SearchResultHits struct {
+	Hits ESHits `json:"hits"`
+}
+
+type ESHit struct {
+	Source BookResponse `json:"_source"`
+}
+
 type bookService struct {
 	bookRepo   repository.BookRepo
 	bookESRepo repository.BookESRepo
+}
+
+type ESHits []ESHit
+
+func (esh ESHits) ToParseBookReponseFromES() []BookResponse {
+	bs := []BookResponse{}
+	for _, val := range esh {
+		bs = append(bs, val.Source)
+	}
+	return bs
 }
 
 func NewBookService(bookRepo repository.BookRepo, bookESRepo repository.BookESRepo) BookService {
@@ -105,10 +129,23 @@ func (b *bookService) UpdateByID(ctx context.Context, id int64, book NewBookRequ
 	}, nil
 }
 
-func (b *bookService) DeleteToESDataStore(ctx context.Context, id int64) error {
-	err := b.bookESRepo.Delete(ctx, id)
+func (b *bookService) GetBookByKeyword(ctx context.Context, keyword string) ([]BookResponse, error) {
+	result, err := b.bookESRepo.Search(ctx, keyword)
 	if err != nil {
-		logger.Warn("cannot delete book to elasticsearch")
+		logger.Warn("cannot search book to elasticsearch")
 	}
-	return err
+
+	books := ParseESToBookResponse(result)
+
+	return books, err
+}
+
+func ParseESToBookResponse(es *esapi.Response) []BookResponse {
+	var s SearchResult
+	if err := json.NewDecoder(es.Body).Decode(&s); err != nil {
+		logger.Warnf("Error parsing the response body from elasticsearch: %s", err)
+	}
+
+	books := s.Hits.Hits.ToParseBookReponseFromES()
+	return books
 }

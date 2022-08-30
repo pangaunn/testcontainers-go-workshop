@@ -100,6 +100,13 @@ func (h handler) UpdateBookByID(c *gin.Context) {
 }
 
 func (h handler) SearchBook(c *gin.Context) {
-	// seach es
-	c.JSON(http.StatusOK, "ok")
+	keyword := c.Query("keyword")
+
+	books, err := h.bookSvc.GetBookByKeyword(c, keyword)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, books)
 }

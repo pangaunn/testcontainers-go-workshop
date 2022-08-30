@@ -66,7 +66,6 @@ func main() {
 		v1.POST("/book", bookHandler.NewBook)
 		v1.PUT("/book/:id", bookHandler.UpdateBookByID)
 		v1.DELETE("/book/:id", bookHandler.DeleteBookByID)
-		// TODO
 		v1.GET("/book/search", bookHandler.SearchBook)
 	}
 
