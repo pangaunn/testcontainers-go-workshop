@@ -2,16 +2,38 @@ package book
 
 import (
 	"context"
-	"database/sql"
-	"errors"
+	"encoding/json"
 
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/repository"
 	logger "github.com/sirupsen/logrus"
 )
 
+type SearchResult struct {
+	Hits SearchResultHits `json:"hits"`
+}
+
+type SearchResultHits struct {
+	Hits ESHits `json:"hits"`
+}
+
+type ESHit struct {
+	Source BookResponse `json:"_source"`
+}
+
 type bookService struct {
 	bookRepo   repository.BookRepo
 	bookESRepo repository.BookESRepo
+}
+
+type ESHits []ESHit
+
+func (esh ESHits) ToParseBookReponseFromES() []BookResponse {
+	bs := []BookResponse{}
+	for _, val := range esh {
+		bs = append(bs, val.Source)
+	}
+	return bs
 }
 
 func NewBookService(bookRepo repository.BookRepo, bookESRepo repository.BookESRepo) BookService {
@@ -56,9 +78,6 @@ func (b *bookService) NewBook(ctx context.Context, data NewBookRequest) (*BookRe
 func (b *bookService) GetBookByID(ctx context.Context, id int64) (*BookResponse, error) {
 	book, err := b.bookRepo.GetByID(ctx, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("book not found")
-		}
 		return nil, err
 	}
 
@@ -77,6 +96,12 @@ func (b *bookService) DeleteByID(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
+
+	err = b.bookESRepo.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -102,4 +127,25 @@ func (b *bookService) UpdateByID(ctx context.Context, id int64, book NewBookRequ
 		Description: bookUpdated.Description,
 		ImageURL:    bookUpdated.ImageURL,
 	}, nil
+}
+
+func (b *bookService) GetBookByKeyword(ctx context.Context, keyword string) ([]BookResponse, error) {
+	result, err := b.bookESRepo.Search(ctx, keyword)
+	if err != nil {
+		logger.Warn("cannot search book to elasticsearch")
+	}
+
+	books := ParseESToBookResponse(result)
+
+	return books, err
+}
+
+func ParseESToBookResponse(es *esapi.Response) []BookResponse {
+	var s SearchResult
+	if err := json.NewDecoder(es.Body).Decode(&s); err != nil {
+		logger.Warnf("Error parsing the response body from elasticsearch: %s", err)
+	}
+
+	books := s.Hits.Hits.ToParseBookReponseFromES()
+	return books
 }

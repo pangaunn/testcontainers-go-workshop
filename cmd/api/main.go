@@ -29,9 +29,13 @@ type databaseCredential struct {
 }
 
 func init() {
-	err := godotenv.Load("./.env")
-	if err != nil {
-		logger.Info("Can't load .env", err)
+	if currentEnvironment, ok := os.LookupEnv("ENV"); ok {
+		if currentEnvironment == "dev" {
+			err := godotenv.Load("./.env")
+			if err != nil {
+				logger.Info("Can't load .env", err)
+			}
+		}
 	}
 }
 
@@ -66,8 +70,7 @@ func main() {
 		v1.POST("/book", bookHandler.NewBook)
 		v1.PUT("/book/:id", bookHandler.UpdateBookByID)
 		v1.DELETE("/book/:id", bookHandler.DeleteBookByID)
-		// TODO
-		v1.GET("/book/search")
+		v1.GET("/book/search", bookHandler.SearchBook)
 	}
 
 	srv := &http.Server{

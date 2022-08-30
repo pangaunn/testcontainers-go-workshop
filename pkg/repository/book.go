@@ -1,6 +1,10 @@
 package repository
 
-import "context"
+import (
+	"context"
+
+	"github.com/elastic/go-elasticsearch/v7/esapi"
+)
 
 type Book struct {
 	ID          int64   `db:"id" json:"id,omitempty"`
@@ -19,6 +23,7 @@ type BookRepo interface {
 }
 
 type BookESRepo interface {
-	Search(ctx context.Context, text string) (interface{}, error)
+	Search(ctx context.Context, keyword string) (*esapi.Response, error)
 	Index(ctx context.Context, b Book) (*Book, error)
+	Delete(ctx context.Context, ID int64) error
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -48,6 +49,10 @@ func (h handler) GetBookByID(c *gin.Context) {
 
 	response, err := h.bookSvc.GetBookByID(c, int64(idInt))
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, "book not found")
+			return
+		}
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -67,7 +72,8 @@ func (h handler) DeleteBookByID(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusNoContent, "")
+
+	c.JSON(http.StatusOK, "OK")
 }
 
 func (h handler) UpdateBookByID(c *gin.Context) {
@@ -91,4 +97,16 @@ func (h handler) UpdateBookByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h handler) SearchBook(c *gin.Context) {
+	keyword := c.Query("keyword")
+
+	books, err := h.bookSvc.GetBookByKeyword(c, keyword)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, books)
 }
