@@ -77,6 +77,12 @@ func (b *bookService) DeleteByID(ctx context.Context, id int64) error {
 	if err != nil {
 		return err
 	}
+
+	err = b.bookESRepo.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -102,4 +108,12 @@ func (b *bookService) UpdateByID(ctx context.Context, id int64, book NewBookRequ
 		Description: bookUpdated.Description,
 		ImageURL:    bookUpdated.ImageURL,
 	}, nil
+}
+
+func (b *bookService) DeleteToESDataStore(ctx context.Context, id int64) error {
+	err := b.bookESRepo.Delete(ctx, id)
+	if err != nil {
+		logger.Warn("cannot delete book to elasticsearch")
+	}
+	return err
 }

@@ -21,4 +21,5 @@ type BookRepo interface {
 type BookESRepo interface {
 	Search(ctx context.Context, text string) (interface{}, error)
 	Index(ctx context.Context, b Book) (*Book, error)
+	Delete(ctx context.Context, ID int64) error
 }

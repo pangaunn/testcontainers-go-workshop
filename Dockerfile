@@ -5,7 +5,7 @@ COPY go.* /
 RUN go mod download
 COPY . .
 ENV GO111MODULE=on
-RUN CGO_ENABLED=0 GOOS=linux go build -o webapp ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o webapp ./cmd/api/main.go
 
 FROM alpine:3.12.0
 RUN apk add --no-cache tzdata

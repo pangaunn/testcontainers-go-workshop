@@ -67,7 +67,7 @@ func main() {
 		v1.PUT("/book/:id", bookHandler.UpdateBookByID)
 		v1.DELETE("/book/:id", bookHandler.DeleteBookByID)
 		// TODO
-		v1.GET("/book/search")
+		v1.GET("/book/search", bookHandler.SearchBook)
 	}
 
 	srv := &http.Server{

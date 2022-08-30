@@ -67,7 +67,8 @@ func (h handler) DeleteBookByID(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusNoContent, "")
+
+	c.JSON(http.StatusOK, "OK")
 }
 
 func (h handler) UpdateBookByID(c *gin.Context) {
@@ -91,4 +92,9 @@ func (h handler) UpdateBookByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h handler) SearchBook(c *gin.Context) {
+	// seach es
+	c.JSON(http.StatusOK, "ok")
 }

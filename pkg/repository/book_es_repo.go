@@ -54,3 +54,20 @@ func (bes *bookESRepo) Index(ctx context.Context, b Book) (*Book, error) {
 func (bes *bookESRepo) Search(ctx context.Context, text string) (interface{}, error) {
 	panic("unimplemented")
 }
+
+func (bes *bookESRepo) Delete(ctx context.Context, ID int64) error {
+	bookID := strconv.Itoa(int(ID))
+	req := esapi.DeleteRequest{
+		Index:      BOOKS_TEMP_INDEX,
+		DocumentID: bookID,
+		Refresh:    "true",
+	}
+
+	_, err := req.Do(ctx, bes.esClient)
+
+	if err != nil {
+		logger.Warnf("Can't delete elasticsearch")
+	}
+
+	return err
+}
