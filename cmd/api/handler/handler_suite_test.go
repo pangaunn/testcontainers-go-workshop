@@ -19,17 +19,25 @@ func TestHandler(t *testing.T) {
 	RunSpecs(t, "Handler Suite")
 }
 
+type ContainerAddress struct {
+	Host string
+	Port string
+}
+
 var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
-	setupMariaDBContainer()
+	maria := setupMariaDBContainer()
+	es := setupElasticSearchContainer()
+
+	fmt.Println(maria, es)
 })
 
-func setupMariaDBContainer() {
+func setupMariaDBContainer() ContainerAddress {
 
 	ctx := context.Background()
 	wd, _ := os.Getwd()
 	wd += "/../../../seed/init.sql"
-	fmt.Println(wd)
+
 	mariadbContainerReq := testcontainers.ContainerRequest{
 		Image:        "mariadb:10.5.8",
 		ExposedPorts: []string{"3306/tcp"},
@@ -58,5 +66,46 @@ func setupMariaDBContainer() {
 		log.Fatalf("mariaDBContainer.MappedPort: %s", err)
 	}
 
-	fmt.Println(mariaDBHost, mariaDBPort)
+	return ContainerAddress{mariaDBHost, mariaDBPort.Port()}
+}
+
+func setupElasticSearchContainer() ContainerAddress {
+	ctx := context.Background()
+	wd, _ := os.Getwd()
+	wd += "/../../../seed/es"
+
+	esContainerReq := testcontainers.ContainerRequest{
+		Image:        "elasticsearch:7.17.6",
+		ExposedPorts: []string{"9200/tcp"},
+		Env: map[string]string{
+			"xpack.security.enabled": "false",
+			"discovery.type":         "single-node",
+		},
+		Mounts:     testcontainers.Mounts(testcontainers.BindMount(wd, "/pre-test-script")),
+		WaitingFor: wait.ForLog("started").WithStartupTimeout(time.Second * 10),
+	}
+
+	esContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: esContainerReq,
+		Started:          true,
+	})
+
+	if err != nil {
+		log.Fatalf("error starting es container: %s", err)
+	}
+
+	_, err = esContainer.Exec(ctx, []string{"sh", "/pre-test-script/es_container_db.sh"})
+
+	if err != nil {
+		log.Fatalf("esContainer.Exec: %s", err)
+	}
+
+	esHost, _ := esContainer.Host(ctx)
+
+	esPort, err := esContainer.MappedPort(ctx, "9200")
+	if err != nil {
+		log.Fatalf("esContainer.MappedPort: %s", err)
+	}
+
+	return ContainerAddress{esHost, esPort.Port()}
 }
