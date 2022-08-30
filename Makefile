@@ -1,5 +1,5 @@
 run-api:
-	ENV=dev go run cmd/main.go
+	ENV=dev go run cmd/api/main.go
 
 run-docker:
 	docker build --progress=plain -t testcontainers-go-workshop -f "./Dockerfile" .
