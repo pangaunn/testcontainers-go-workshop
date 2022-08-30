@@ -10,23 +10,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/pangaunn/testcontainers-go-workshop/cmd/api/handler"
-	"github.com/pangaunn/testcontainers-go-workshop/pkg/book"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/datastore"
-	"github.com/pangaunn/testcontainers-go-workshop/pkg/repository"
 	logger "github.com/sirupsen/logrus"
 )
-
-type databaseCredential struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	Name     string
-}
 
 func init() {
 	if currentEnvironment, ok := os.LookupEnv("ENV"); ok {
@@ -40,7 +28,7 @@ func init() {
 }
 
 func main() {
-	dbCredential := databaseCredential{
+	dbCredential := datastore.DatabaseCredential{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
 		Username: os.Getenv("DB_USERNAME"),
@@ -48,34 +36,11 @@ func main() {
 		Name:     os.Getenv("DB_NAME"),
 	}
 
-	connStr := generateMysqlConnectionString(dbCredential)
-	sqlConn := datastore.InitMySQL(connStr)
-
-	cfg := elasticsearch.Config{Addresses: []string{os.Getenv("ELASTICSEARCH_API_ENDPOINT")}}
-	esClient, err := elasticsearch.NewClient(cfg)
-	if err != nil {
-		logger.Fatal("elasticsearch.NewClient Error: ", err)
-	}
-
-	bookRepo := repository.NewBookRepo(sqlConn)
-	bookESRepo := repository.NewBookESRepo(esClient, time.Second*5)
-	bookSvc := book.NewBookService(bookRepo, bookESRepo)
-	bookHandler := handler.NewHandler(bookSvc)
-
-	r := gin.Default()
-	r.GET("/healthcheck", bookHandler.Healthcheck)
-	v1 := r.Group("/api/v1")
-	{
-		v1.GET("/book/:id", bookHandler.GetBookByID)
-		v1.POST("/book", bookHandler.NewBook)
-		v1.PUT("/book/:id", bookHandler.UpdateBookByID)
-		v1.DELETE("/book/:id", bookHandler.DeleteBookByID)
-		v1.GET("/book/search", bookHandler.SearchBook)
-	}
+	engine := handler.InitHandler(dbCredential, os.Getenv("ELASTICSEARCH_API_ENDPOINT"))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")),
-		Handler: r,
+		Handler: engine,
 	}
 
 	go func() {
@@ -101,8 +66,4 @@ func main() {
 	}
 	logger.Info("Server exiting")
 
-}
-
-func generateMysqlConnectionString(cred databaseCredential) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cred.Username, cred.Password, cred.Host, cred.Port, cred.Name)
 }
