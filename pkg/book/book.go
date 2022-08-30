@@ -21,8 +21,8 @@ type BookResponse struct {
 
 type BookService interface {
 	NewBook(ctx context.Context, book NewBookRequest) (*BookResponse, error)
-	GetBookByID(ctx context.Context, id int64) (*BookResponse, error)
-	DeleteByID(ctx context.Context, id int64) error
-	UpdateByID(ctx context.Context, id int64, book NewBookRequest) (*BookResponse, error)
+	GetBookByID(ctx context.Context, ID int64) (*BookResponse, error)
+	DeleteByID(ctx context.Context, ID int64) error
+	UpdateByID(ctx context.Context, ID int64, book NewBookRequest) (*BookResponse, error)
 	GetBookByKeyword(ctx context.Context, keyword string) ([]BookResponse, error)
 }

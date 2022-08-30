@@ -41,7 +41,7 @@ func setupMariaDBContainer() ContainerAddress {
 	wd, _ := os.Getwd()
 	wd += "/../../../seed/init.sql"
 
-	mariadbContainerReq := testcontainers.ContainerRequest{
+	mariaDBContainerReq := testcontainers.ContainerRequest{
 		Image:        "mariadb:10.5.8",
 		ExposedPorts: []string{"3306/tcp"},
 		Env: map[string]string{
@@ -54,7 +54,7 @@ func setupMariaDBContainer() ContainerAddress {
 	}
 
 	mariaDBContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: mariadbContainerReq,
+		ContainerRequest: mariaDBContainerReq,
 		Started:          true,
 	})
 
