@@ -75,8 +75,8 @@ func (b *bookService) NewBook(ctx context.Context, data NewBookRequest) (*BookRe
 	}, nil
 }
 
-func (b *bookService) GetBookByID(ctx context.Context, id int64) (*BookResponse, error) {
-	book, err := b.bookRepo.GetByID(ctx, id)
+func (b *bookService) GetBookByID(ctx context.Context, ID int64) (*BookResponse, error) {
+	book, err := b.bookRepo.GetByID(ctx, ID)
 	if err != nil {
 		return nil, err
 	}
@@ -91,13 +91,13 @@ func (b *bookService) GetBookByID(ctx context.Context, id int64) (*BookResponse,
 	}, nil
 }
 
-func (b *bookService) DeleteByID(ctx context.Context, id int64) error {
-	err := b.bookRepo.DeleteByID(ctx, id)
+func (b *bookService) DeleteByID(ctx context.Context, ID int64) error {
+	err := b.bookRepo.DeleteByID(ctx, ID)
 	if err != nil {
 		return err
 	}
 
-	err = b.bookESRepo.Delete(ctx, id)
+	err = b.bookESRepo.Delete(ctx, ID)
 	if err != nil {
 		return err
 	}
@@ -105,22 +105,23 @@ func (b *bookService) DeleteByID(ctx context.Context, id int64) error {
 	return nil
 }
 
-func (b *bookService) UpdateByID(ctx context.Context, id int64, book NewBookRequest) (*BookResponse, error) {
+func (b *bookService) UpdateByID(ctx context.Context, ID int64, book NewBookRequest) (*BookResponse, error) {
 	newBookUpdated := repository.Book{
+		ID:          ID,
 		Name:        book.Name,
 		Price:       book.Price,
 		Author:      book.Author,
 		Description: book.Description,
 		ImageURL:    book.ImageURL,
 	}
-	bookUpdated, err := b.bookRepo.Update(ctx, id, newBookUpdated)
+	bookUpdated, err := b.bookRepo.Update(ctx, newBookUpdated)
 	if err != nil {
 		return nil, err
 	}
 
 	b.captureToESDataStore(ctx, bookUpdated)
 	return &BookResponse{
-		ID:          id,
+		ID:          ID,
 		Name:        bookUpdated.Name,
 		Price:       bookUpdated.Price,
 		Author:      bookUpdated.Author,
