@@ -10,6 +10,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	logger "github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
@@ -20,8 +21,9 @@ func TestHandler(t *testing.T) {
 }
 
 type ContainerAddress struct {
-	Host string
-	Port string
+	Host      string
+	Port      string
+	Terminate func()
 }
 
 var (
@@ -33,6 +35,12 @@ var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
 	Maria = setupMariaDBContainer()
 	ES = setupElasticSearchContainer()
+})
+
+var _ = AfterSuite(func() {
+	fmt.Println("⛔️ AfterSuite Integration test")
+	Maria.Terminate()
+	ES.Terminate()
 })
 
 func setupMariaDBContainer() ContainerAddress {
@@ -69,7 +77,14 @@ func setupMariaDBContainer() ContainerAddress {
 		log.Fatalf("mariaDBContainer.MappedPort: %s", err)
 	}
 
-	return ContainerAddress{mariaDBHost, mariaDBPort.Port()}
+	terminateContainer := func() {
+		logger.Info("terminating maria container...")
+		if err := mariaDBContainer.Terminate(ctx); err != nil {
+			log.Fatalf("error terminating maria container: %v\n", err)
+		}
+	}
+
+	return ContainerAddress{mariaDBHost, mariaDBPort.Port(), terminateContainer}
 }
 
 func setupElasticSearchContainer() ContainerAddress {
@@ -94,21 +109,28 @@ func setupElasticSearchContainer() ContainerAddress {
 	})
 
 	if err != nil {
-		log.Fatalf("error starting es container: %s", err)
+		logger.Fatalf("error starting es container: %s", err)
 	}
 
 	_, err = esContainer.Exec(ctx, []string{"sh", "/pre-test-script/es_container_db.sh"})
 
 	if err != nil {
-		log.Fatalf("esContainer.Exec: %s", err)
+		logger.Fatalf("esContainer.Exec: %s", err)
 	}
 
 	esHost, _ := esContainer.Host(ctx)
 
 	esPort, err := esContainer.MappedPort(ctx, "9200")
 	if err != nil {
-		log.Fatalf("esContainer.MappedPort: %s", err)
+		logger.Fatalf("esContainer.MappedPort: %s", err)
 	}
 
-	return ContainerAddress{esHost, esPort.Port()}
+	terminateContainer := func() {
+		logger.Info("terminating es container...")
+		if err := esContainer.Terminate(ctx); err != nil {
+			logger.Fatalf("error terminating es container: %v\n", err)
+		}
+	}
+
+	return ContainerAddress{esHost, esPort.Port(), terminateContainer}
 }
