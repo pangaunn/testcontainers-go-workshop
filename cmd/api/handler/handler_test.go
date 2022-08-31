@@ -1,10 +1,8 @@
-//go:build integration
-// +build integration
-
+// build+integration
 package handler_test
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -13,16 +11,14 @@ import (
 )
 
 var API_URL = "http://localhost:3000"
-var _ = Describe("Handler", func() {
-
+var _ = Describe("Handler", Label("integration"), func() {
 	It("Should return OK 200", func() {
 		req, _ := http.NewRequest(http.MethodGet, API_URL+"/healthcheck", nil)
 		w := httptest.NewRecorder()
 		Engine.ServeHTTP(w, req)
 
-		res, _ := ioutil.ReadAll(w.Body)
+		res, _ := io.ReadAll(w.Body)
 		Expect(w.Code).To(Equal(http.StatusOK))
 		Expect(string(res)).To(Equal("\"OK\""))
 	})
-
 })
