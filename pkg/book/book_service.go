@@ -149,7 +149,6 @@ func (b *bookService) GetCache(ctx context.Context, keyword string) ([]BookRespo
 	cache, err := b.redisClient.Get(keyword).Result()
 	if err != nil {
 		if err == redis.Nil {
-			logger.Info("keyword no found")
 			return []BookResponse{}, nil
 		}
 		logger.Warn("error b.redisClient.Get", err)

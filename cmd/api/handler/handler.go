@@ -147,6 +147,7 @@ func (h handler) SearchBook(c *gin.Context) {
 	}
 
 	if len(cacheBooks) > 0 {
+		logger.Info("get book from cache.")
 		c.JSON(http.StatusOK, cacheBooks)
 		return
 	}
