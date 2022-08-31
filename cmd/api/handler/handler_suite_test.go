@@ -8,8 +8,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/pangaunn/testcontainers-go-workshop/cmd/api/handler"
+	"github.com/pangaunn/testcontainers-go-workshop/pkg/datastore"
 	logger "github.com/sirupsen/logrus"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -27,14 +30,26 @@ type ContainerAddress struct {
 }
 
 var (
-	Maria ContainerAddress
-	ES    ContainerAddress
+	Maria  ContainerAddress
+	ES     ContainerAddress
+	Engine *gin.Engine
 )
 
 var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
 	Maria = setupMariaDBContainer()
 	ES = setupElasticSearchContainer()
+
+	// init handler
+	dbCredential := datastore.DatabaseCredential{
+		Host:     Maria.Host,
+		Port:     Maria.Port,
+		Username: "root",
+		Password: "root",
+		Name:     "books",
+	}
+	esURL := fmt.Sprintf("http://%s:%s", ES.Host, ES.Port)
+	Engine = handler.InitHandler(dbCredential, esURL)
 })
 
 var _ = AfterSuite(func() {
