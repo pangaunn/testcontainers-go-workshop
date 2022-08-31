@@ -50,7 +50,7 @@ var _ = Describe("Handler", func() {
 		Expect(b).To(Equal(expected))
 	})
 
-	It("Create Book Should return OK 200", func() {
+	It("Create Book Should return OK 201", func() {
 		payload := book.NewBookRequest{
 			Name:        "the snowman (harry hole)",
 			Price:       320,
@@ -125,9 +125,21 @@ var _ = Describe("Handler", func() {
 
 		Expect(w.Code).To(Equal(http.StatusOK))
 		Expect(string(res)).To(Equal("\"OK\""))
+
+		getReq, _ := http.NewRequest(http.MethodGet, API_URL+"/api/v1/book/1", nil)
+		w2 := httptest.NewRecorder()
+		Engine.ServeHTTP(w2, getReq)
+
+		resGet, _ := ioutil.ReadAll(w2.Body)
+		var b book.BookResponse
+		json.Unmarshal(resGet, &b)
+
+		Expect(w.Code).To(Equal(http.StatusOK))
+		Expect(b).To(Equal(book.BookResponse{}))
+
 	})
 
-	It("Search Book Should return OK 200", func() {
+	It("Create book then search for it should found", func() {
 		payload := book.NewBookRequest{
 			Name:        "the snowman (harry hole)",
 			Price:       320,
