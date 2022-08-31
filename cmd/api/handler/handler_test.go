@@ -50,7 +50,6 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("Create Book Should return OK 200", func() {
-
 		payload := book.NewBookRequest{
 			Name:        "the snowman (harry hole)",
 			Price:       320,
@@ -68,6 +67,38 @@ var _ = Describe("Handler", func() {
 
 		expected := book.BookResponse{
 			ID:          3,
+			Name:        "the snowman (harry hole)",
+			Price:       320,
+			Author:      "Jo Nesbø",
+			Description: "the snowman",
+			ImageURL:    "https://images-na.ssl-images-amazon.com/images/I/51kgjrXdYKL._SX325_BO1,204,203,200_.jpg",
+		}
+
+		res, _ := ioutil.ReadAll(w.Body)
+		var b book.BookResponse
+		json.Unmarshal(res, &b)
+
+		Expect(b).To(Equal(expected))
+	})
+
+	It("Update Book Should return OK 200", func() {
+		payload := book.NewBookRequest{
+			Name:        "the snowman (harry hole)",
+			Price:       320,
+			Author:      "Jo Nesbø",
+			Description: "the snowman",
+			ImageURL:    "https://images-na.ssl-images-amazon.com/images/I/51kgjrXdYKL._SX325_BO1,204,203,200_.jpg",
+		}
+
+		data, _ := json.Marshal(payload)
+		reader := bytes.NewReader(data)
+
+		req, _ := http.NewRequest(http.MethodPut, API_URL+"/api/v1/book/2", reader)
+		w := httptest.NewRecorder()
+		Engine.ServeHTTP(w, req)
+
+		expected := book.BookResponse{
+			ID:          2,
 			Name:        "the snowman (harry hole)",
 			Price:       320,
 			Author:      "Jo Nesbø",
