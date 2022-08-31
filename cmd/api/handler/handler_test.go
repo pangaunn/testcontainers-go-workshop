@@ -173,5 +173,4 @@ var _ = Describe("Handler", Label("integration"), func() {
 
 		Expect(b[0]).To(Equal(expected[0]))
 	})
-
 })

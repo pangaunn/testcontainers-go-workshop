@@ -8,6 +8,7 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/book"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/datastore"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/repository"
@@ -24,7 +25,7 @@ func NewHandler(b book.BookService) handler {
 	}
 }
 
-func InitHandler(cre datastore.DatabaseCredential, esURL string) *gin.Engine {
+func InitHandler(cre datastore.DatabaseCredential, esURL string, redisURL string) *gin.Engine {
 	connStr := datastore.GenerateMysqlConnectionString(cre)
 	sqlConn := datastore.InitMySQL(connStr)
 
@@ -34,9 +35,13 @@ func InitHandler(cre datastore.DatabaseCredential, esURL string) *gin.Engine {
 		logger.Fatal("elasticsearch.NewClient Error: ", err)
 	}
 
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisURL,
+	})
+
 	bookRepo := repository.NewBookRepo(sqlConn)
 	bookESRepo := repository.NewBookESRepo(esClient, time.Second*5)
-	bookSvc := book.NewBookService(bookRepo, bookESRepo)
+	bookSvc := book.NewBookService(bookRepo, bookESRepo, redisClient)
 	bookHandler := NewHandler(bookSvc)
 
 	r := gin.Default()

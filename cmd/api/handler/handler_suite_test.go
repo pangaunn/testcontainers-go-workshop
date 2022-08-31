@@ -33,12 +33,14 @@ var (
 	Maria  ContainerAddress
 	ES     ContainerAddress
 	Engine *gin.Engine
+	Redis  ContainerAddress
 )
 
 var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
 	Maria = setupMariaDBContainer()
 	ES = setupElasticSearchContainer()
+	Redis = setupRedisContainer()
 
 	// init handler
 	dbCredential := datastore.DatabaseCredential{
@@ -49,7 +51,8 @@ var _ = BeforeSuite(func() {
 		Name:     "books",
 	}
 	esURL := fmt.Sprintf("http://%s:%s", ES.Host, ES.Port)
-	Engine = handler.InitHandler(dbCredential, esURL)
+	redisURL := fmt.Sprintf("%s:%s", Redis.Host, Redis.Port)
+	Engine = handler.InitHandler(dbCredential, esURL, redisURL)
 })
 
 var _ = AfterSuite(func() {
@@ -148,4 +151,37 @@ func setupElasticSearchContainer() ContainerAddress {
 	}
 
 	return ContainerAddress{esHost, esPort.Port(), terminateContainer}
+}
+
+func setupRedisContainer() ContainerAddress {
+	ctx := context.Background()
+	redisContainerRequest := testcontainers.ContainerRequest{
+		Image:        "redis:6",
+		ExposedPorts: []string{"6379/tcp"},
+		WaitingFor:   wait.ForLog("Ready to accept connections").WithStartupTimeout(time.Second * 300),
+	}
+
+	redisContainer, err := testcontainers.GenericContainer(context.Background(), testcontainers.GenericContainerRequest{
+		ContainerRequest: redisContainerRequest,
+		Started:          true,
+	})
+
+	if err != nil {
+		logger.Fatalf("error starting redis container: %s", err)
+	}
+
+	redisHost, _ := redisContainer.Host(ctx)
+	redisPort, err := redisContainer.MappedPort(ctx, "6379")
+	if err != nil {
+		logger.Fatalf("redisContainer.MappedPort: %s", err)
+	}
+
+	terminateContainer := func() {
+		logger.Info("terminating es container...")
+		if err := redisContainer.Terminate(ctx); err != nil {
+			logger.Fatalf("error terminating es container: %v\n", err)
+		}
+	}
+
+	return ContainerAddress{redisHost, redisPort.Port(), terminateContainer}
 }

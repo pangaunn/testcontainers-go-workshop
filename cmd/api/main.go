@@ -36,7 +36,7 @@ func main() {
 		Name:     os.Getenv("DB_NAME"),
 	}
 
-	engine := handler.InitHandler(dbCredential, os.Getenv("ELASTICSEARCH_API_ENDPOINT"))
+	engine := handler.InitHandler(dbCredential, os.Getenv("ELASTICSEARCH_API_ENDPOINT"), os.Getenv("REDIS_ENDPOINT"))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")),

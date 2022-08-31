@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/elastic/go-elasticsearch/v7 v7.17.2-0.20220823112509-736c91e57144
 	github.com/gin-gonic/gin v1.8.1
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/joho/godotenv v1.4.0
 	github.com/onsi/ginkgo/v2 v2.1.5
 	github.com/onsi/gomega v1.20.1
