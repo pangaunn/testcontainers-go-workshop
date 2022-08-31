@@ -73,7 +73,7 @@ func setupMariaDBContainer() ContainerAddress {
 			"MYSQL_DATABASE":      "books",
 		},
 		Mounts:     testcontainers.Mounts(testcontainers.BindMount(wd, "/docker-entrypoint-initdb.d/init.sql")),
-		WaitingFor: wait.ForLog("3306  mariadb.org binary distribution").WithStartupTimeout(time.Second * 10),
+		WaitingFor: wait.ForLog("3306  mariadb.org binary distribution").WithStartupTimeout(time.Second * 300),
 	}
 
 	mariaDBContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
@@ -115,7 +115,7 @@ func setupElasticSearchContainer() ContainerAddress {
 			"discovery.type":         "single-node",
 		},
 		Mounts:     testcontainers.Mounts(testcontainers.BindMount(wd, "/pre-test-script")),
-		WaitingFor: wait.ForLog("started").WithStartupTimeout(time.Second * 10),
+		WaitingFor: wait.ForLog("started").WithStartupTimeout(time.Second * 300),
 	}
 
 	esContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
