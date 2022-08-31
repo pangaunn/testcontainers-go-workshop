@@ -1,12 +1,9 @@
-//go:build integration
-// +build integration
-
 package handler_test
 
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -16,14 +13,14 @@ import (
 )
 
 var API_URL = "http://localhost:3000"
-var _ = Describe("Handler", func() {
+var _ = Describe("Handler", Label("integration"), func() {
 
 	It("Should return OK 200", func() {
 		req, _ := http.NewRequest(http.MethodGet, API_URL+"/healthcheck", nil)
 		w := httptest.NewRecorder()
 		Engine.ServeHTTP(w, req)
 
-		res, _ := ioutil.ReadAll(w.Body)
+		res, _ := io.ReadAll(w.Body)
 
 		Expect(w.Code).To(Equal(http.StatusOK))
 		Expect(string(res)).To(Equal("\"OK\""))
@@ -34,7 +31,7 @@ var _ = Describe("Handler", func() {
 		w := httptest.NewRecorder()
 		Engine.ServeHTTP(w, req)
 
-		res, _ := ioutil.ReadAll(w.Body)
+		res, _ := io.ReadAll(w.Body)
 		var b book.BookResponse
 		json.Unmarshal(res, &b)
 		expected := book.BookResponse{
@@ -75,7 +72,7 @@ var _ = Describe("Handler", func() {
 			ImageURL:    "https://images-na.ssl-images-amazon.com/images/I/51kgjrXdYKL._SX325_BO1,204,203,200_.jpg",
 		}
 
-		res, _ := ioutil.ReadAll(w.Body)
+		res, _ := io.ReadAll(w.Body)
 		var b book.BookResponse
 		json.Unmarshal(res, &b)
 
@@ -108,7 +105,7 @@ var _ = Describe("Handler", func() {
 			ImageURL:    "https://images-na.ssl-images-amazon.com/images/I/51kgjrXdYKL._SX325_BO1,204,203,200_.jpg",
 		}
 
-		res, _ := ioutil.ReadAll(w.Body)
+		res, _ := io.ReadAll(w.Body)
 		var b book.BookResponse
 		json.Unmarshal(res, &b)
 
@@ -121,7 +118,7 @@ var _ = Describe("Handler", func() {
 		w := httptest.NewRecorder()
 		Engine.ServeHTTP(w, req)
 
-		res, _ := ioutil.ReadAll(w.Body)
+		res, _ := io.ReadAll(w.Body)
 
 		Expect(w.Code).To(Equal(http.StatusOK))
 		Expect(string(res)).To(Equal("\"OK\""))
@@ -130,7 +127,7 @@ var _ = Describe("Handler", func() {
 		w2 := httptest.NewRecorder()
 		Engine.ServeHTTP(w2, getReq)
 
-		resGet, _ := ioutil.ReadAll(w2.Body)
+		resGet, _ := io.ReadAll(w2.Body)
 		var b book.BookResponse
 		json.Unmarshal(resGet, &b)
 
@@ -158,7 +155,7 @@ var _ = Describe("Handler", func() {
 		w2 := httptest.NewRecorder()
 		Engine.ServeHTTP(w2, searchReq)
 
-		res, _ := ioutil.ReadAll(w2.Body)
+		res, _ := io.ReadAll(w2.Body)
 
 		var b []book.BookResponse
 		json.Unmarshal(res, &b)
