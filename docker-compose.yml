@@ -12,6 +12,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     
   db:
     image: mariadb:10.5.8
@@ -72,7 +74,7 @@ services:
     restart: always
     ports:
       - '6379:6379'
-    depends_on:
-      - elasticsearch
-      - db
-      
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping" ]
+      timeout: 20s
+      retries: 10

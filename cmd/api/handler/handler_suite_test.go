@@ -158,7 +158,9 @@ func setupRedisContainer() ContainerAddress {
 	redisContainerRequest := testcontainers.ContainerRequest{
 		Image:        "redis:6",
 		ExposedPorts: []string{"6379/tcp"},
+		WaitingFor:   wait.ForLog("Ready to accept connections").WithStartupTimeout(time.Second * 300),
 	}
+
 	redisContainer, err := testcontainers.GenericContainer(context.Background(), testcontainers.GenericContainerRequest{
 		ContainerRequest: redisContainerRequest,
 		Started:          true,
