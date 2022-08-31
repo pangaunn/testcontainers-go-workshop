@@ -1,7 +1,8 @@
 # Testcontainers-go workshop
 
 ## Prerequisite
-- installed golang 
+- docker up and running
+- installed golang
 - [ginkgo](https://onsi.github.io/ginkgo/MIGRATING_TO_V2)
 
 ## Before workshop please run
