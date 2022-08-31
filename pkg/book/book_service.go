@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/go-redis/redis"
 	"github.com/pangaunn/testcontainers-go-workshop/pkg/repository"
 	logger "github.com/sirupsen/logrus"
 )
@@ -22,8 +23,9 @@ type ESHit struct {
 }
 
 type bookService struct {
-	bookRepo   repository.BookRepo
-	bookESRepo repository.BookESRepo
+	bookRepo    repository.BookRepo
+	bookESRepo  repository.BookESRepo
+	redisClient *redis.Client
 }
 
 type ESHits []ESHit
@@ -36,10 +38,11 @@ func (esh ESHits) ToParseBookReponseFromES() []BookResponse {
 	return bs
 }
 
-func NewBookService(bookRepo repository.BookRepo, bookESRepo repository.BookESRepo) BookService {
+func NewBookService(bookRepo repository.BookRepo, bookESRepo repository.BookESRepo, redisClient *redis.Client) BookService {
 	return &bookService{
-		bookRepo:   bookRepo,
-		bookESRepo: bookESRepo,
+		bookRepo:    bookRepo,
+		bookESRepo:  bookESRepo,
+		redisClient: redisClient,
 	}
 }
 

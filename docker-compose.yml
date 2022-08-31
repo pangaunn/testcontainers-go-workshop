@@ -67,3 +67,12 @@ services:
      depends_on:
         - elasticsearch
         - kibana
+  redis:
+    image: redis:6.2
+    restart: always
+    ports:
+      - '6379:6379'
+    depends_on:
+      - elasticsearch
+      - db
+      
