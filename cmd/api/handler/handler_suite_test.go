@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pangaunn/testcontainers-go-workshop/cmd/api/handler"
@@ -36,6 +37,8 @@ var (
 	Redis  ContainerAddress
 )
 
+var Cache *redis.Client
+
 var _ = BeforeSuite(func() {
 	fmt.Println("🟢 BeforeSuite Integration test")
 	Maria = setupMariaDBContainer()
@@ -53,12 +56,17 @@ var _ = BeforeSuite(func() {
 	esURL := fmt.Sprintf("http://%s:%s", ES.Host, ES.Port)
 	redisURL := fmt.Sprintf("%s:%s", Redis.Host, Redis.Port)
 	Engine = handler.InitHandler(dbCredential, esURL, redisURL)
+
+	Cache = redis.NewClient(&redis.Options{
+		Addr: redisURL,
+	})
 })
 
 var _ = AfterSuite(func() {
 	fmt.Println("⛔️ AfterSuite Integration test")
 	Maria.Terminate()
 	ES.Terminate()
+	Redis.Terminate()
 })
 
 func setupMariaDBContainer() ContainerAddress {

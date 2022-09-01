@@ -164,8 +164,11 @@ func (b *bookService) GetCache(ctx context.Context, keyword string) ([]BookRespo
 }
 
 func (b *bookService) SetCache(ctx context.Context, keyword string, books []BookResponse) error {
-	data, _ := json.Marshal(books)
-	err := b.redisClient.Set(keyword, string(data), time.Second*3000).Err()
+	data, err := json.Marshal(books)
+	if err != nil {
+		logger.Warn("cache redis marshal ", err)
+	}
+	err = b.redisClient.Set(keyword, string(data), time.Second*3000).Err()
 	if err != nil {
 		logger.Warn("error b.redisClient.Set", err)
 	}
