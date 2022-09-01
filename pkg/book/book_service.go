@@ -3,6 +3,7 @@ package book
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/go-redis/redis"
@@ -142,6 +143,34 @@ func (b *bookService) GetBookByKeyword(ctx context.Context, keyword string) ([]B
 	books := ParseESToBookResponse(result)
 
 	return books, err
+}
+
+func (b *bookService) GetCache(ctx context.Context, keyword string) ([]BookResponse, error) {
+	cache, err := b.redisClient.Get(keyword).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return []BookResponse{}, nil
+		}
+		logger.Warn("error b.redisClient.Get", err)
+	}
+
+	var br []BookResponse
+	err = json.Unmarshal([]byte(cache), &br)
+	if err != nil {
+		logger.Warn("error json unmarshal", err)
+	}
+
+	return br, err
+}
+
+func (b *bookService) SetCache(ctx context.Context, keyword string, books []BookResponse) error {
+	data, _ := json.Marshal(books)
+	err := b.redisClient.Set(keyword, string(data), time.Second*3000).Err()
+	if err != nil {
+		logger.Warn("error b.redisClient.Set", err)
+	}
+
+	return err
 }
 
 func ParseESToBookResponse(es *esapi.Response) []BookResponse {

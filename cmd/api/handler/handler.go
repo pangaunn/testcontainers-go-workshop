@@ -141,10 +141,26 @@ func (h handler) UpdateBookByID(c *gin.Context) {
 func (h handler) SearchBook(c *gin.Context) {
 	keyword := c.Query("keyword")
 
+	cacheBooks, err := h.bookSvc.GetCache(c, keyword)
+	if err != nil {
+		logger.Warn("cannot search keyword from redis")
+	}
+
+	if len(cacheBooks) > 0 {
+		logger.Info("get book from cache.")
+		c.JSON(http.StatusOK, cacheBooks)
+		return
+	}
+
 	books, err := h.bookSvc.GetBookByKeyword(c, keyword)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	err = h.bookSvc.SetCache(c, keyword, books)
+	if err != nil {
+		logger.Warn("cannot set keyword from redis")
 	}
 
 	c.JSON(http.StatusOK, books)

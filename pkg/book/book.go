@@ -25,4 +25,6 @@ type BookService interface {
 	DeleteByID(ctx context.Context, ID int64) error
 	UpdateByID(ctx context.Context, ID int64, book NewBookRequest) (*BookResponse, error)
 	GetBookByKeyword(ctx context.Context, keyword string) ([]BookResponse, error)
+	GetCache(ctx context.Context, keyword string) ([]BookResponse, error)
+	SetCache(ctx context.Context, keyword string, books []BookResponse) error
 }
