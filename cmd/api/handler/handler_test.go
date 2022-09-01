@@ -173,4 +173,49 @@ var _ = Describe("Handler", Label("integration"), func() {
 
 		Expect(b[0]).To(Equal(expected[0]))
 	})
+
+	It("Create book & get cache then search for it should found", func() {
+		keyword := "test"
+
+		payload := book.NewBookRequest{
+			Name:        "test book",
+			Price:       320,
+			Author:      "test book",
+			Description: "test book",
+			ImageURL:    "",
+		}
+		data, _ := json.Marshal(payload)
+		reader := bytes.NewReader(data)
+
+		req, _ := http.NewRequest(http.MethodPost, API_URL+"/api/v1/book", reader)
+		w := httptest.NewRecorder()
+		Engine.ServeHTTP(w, req)
+
+		searchReq, _ := http.NewRequest(http.MethodGet, API_URL+"/api/v1/book/search?keyword="+keyword, nil)
+		w2 := httptest.NewRecorder()
+		Engine.ServeHTTP(w2, searchReq)
+
+		res, _ := io.ReadAll(w2.Body)
+
+		var b []book.BookResponse
+		json.Unmarshal(res, &b)
+
+		expected := []book.BookResponse{
+			{
+				ID:          5,
+				Name:        "test book",
+				Price:       320,
+				Author:      "test book",
+				Description: "test book",
+				ImageURL:    "",
+			},
+		}
+
+		val, _ := Cache.Get(keyword).Result()
+		byte, _ := json.Marshal(expected)
+
+		Expect(val).To(MatchJSON(string(byte)))
+		Expect(b[0]).To(Equal(expected[0]))
+
+	})
 })
