@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -148,7 +147,6 @@ func (h handler) SearchBook(c *gin.Context) {
 	}
 
 	if len(cacheBooks) > 0 {
-		fmt.Println("💮", cacheBooks)
 		logger.Info("get book from cache.")
 		c.JSON(http.StatusOK, cacheBooks)
 		return
